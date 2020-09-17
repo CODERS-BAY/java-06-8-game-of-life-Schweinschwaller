@@ -57,7 +57,6 @@ public class Main {
     }
 
     public static void printHabitat(boolean[][] habitat) {
-
         for (int i = 0; i < habitat.length; i++) {
             for (int j = 0; j < habitat[0].length; j++) {
 
@@ -77,6 +76,7 @@ public class Main {
         }
     }
 
+    // how many neighbors have a Cell
     public static int neighbors(boolean[][] habitat, int posX, int posY) {
         int neighbor = 0;
         int xMax = habitat.length - 1;
@@ -106,7 +106,7 @@ public class Main {
             return neighbor;
         }
 
-        //Case 2
+        //Case 2 - top edge
         // Y == yMax and X NOT at Border
         //X-1 Ymin | X Ymin | X+1 Ymin
         //X-1 Y   | X Y   | X+1 Y
@@ -130,7 +130,7 @@ public class Main {
             return neighbor;
         }
 
-        // Case 3
+        // Case 3 - bottom edge
         // Y == 0 and X NOT at Border
         //X-1 Y+1 | X Y+1 | X+1 Y+1
         //X-1 Y   | X Y   | X+1 Y
@@ -154,7 +154,7 @@ public class Main {
             return neighbor;
         }
 
-        // Case 4
+        // Case 4 - left edge
         // X == 0 and Y NOT at Border
         //Xmax Y+1 | X Y+1 | X+1 Y+1
         //Xmax Y   | X Y   | X+1 Y
@@ -178,7 +178,7 @@ public class Main {
             return neighbor;
         }
 
-        // Case 5
+        // Case 5 - rigth edge
         // X == Max and Y NOT at Border
         //X-1 Y+1 | X Y+1 | Xmin Y+1
         //X-1 Y   | X Y   | Xmin Y
@@ -202,7 +202,7 @@ public class Main {
             return neighbor;
         }
 
-        // Case 6
+        // Case 6 - left bottom corner
         // X == 0 and Y == 0
         //Xmax Y+1  | X Y+1 | X-1 Y+1
         //Xmax Y    | X Y   | X+1 Y
@@ -226,7 +226,7 @@ public class Main {
             return neighbor;
         }
 
-        // Case 7
+        // Case 7 - rigth bottom corner
         // X == max and Y == 0
         //X-1 Y+1  | X Y+1  | Xmin Y+1
         //X-1 Y    | X Y    | Xmin Y
@@ -250,7 +250,7 @@ public class Main {
             return neighbor;
         }
 
-        // Case 8
+        // Case 8 - left top edge
         // X == 0 and Y == max
         //Xmax Ymin | X Ymin | X+1 Ymin
         //Xmax Y    | X Y    | X+1 Y
@@ -274,7 +274,7 @@ public class Main {
             return neighbor;
         }
 
-        // Case 9
+        // Case 9 - rigth top corner
         // X == max and Y == max
         //X-1 Ymin | X Ymin | Xmax Ymin
         //X-1 Y    | X Y    | Xmax Y
