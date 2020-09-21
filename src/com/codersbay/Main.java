@@ -7,53 +7,44 @@ public class Main {
     public static void main(String[] args) {
 
         Scanner s = new Scanner(System.in);
-        // in Test case start to comment here
-        int habitatSize = 0;
-        System.out.println("----------------------------------------------");
-        do {
-            System.out.print("Size of the Habitat:");
-            habitatSize = s.nextInt();
-        } while (habitatSize <= 1);
-
+        // Enable or disable TEST here!!
+        boolean TEST = true;
         // there is life or no life --> boolean: false == nolife  true == life
-        boolean[][] habitat = new boolean[habitatSize][habitatSize];
+        boolean[][] habitat;
 
-        Random furtuna = new Random();
-        for (int i = 0; i < habitatSize; i++) {
-            for (int j = 0; j < habitatSize; j++) {
-                habitat[j][i] = furtuna.nextBoolean();
+        if (TEST) {//Test cases
+            final int habitatSize = 10;
+            habitat = new boolean[habitatSize][habitatSize];
+            for (int i = 0; i < habitatSize; i++) {
+                for (int j = 0; j < habitatSize; j++) {
+                    habitat[j][i] = false;
+                }
+            }
+            // case normal
+            set3Cells(habitat,2,3);
+            // case edge
+            set3Cells(habitat,habitatSize - 1,6);
+            // case corner
+            set3Cells(habitat, habitatSize - 1, 0);
+
+        } else {
+            // user Input --> size of the habitat
+            int habitatSize = 0;
+            // there is life or no life --> boolean: false == nolife  true == life
+            habitat = new boolean[habitatSize][habitatSize];
+            System.out.println("----------------------------------------------");
+            do {
+                System.out.print("Size of the Habitat:");
+                habitatSize = s.nextInt();
+            } while (habitatSize <= 1);
+
+            Random furtuna = new Random();
+            for (int i = 0; i < habitatSize; i++) {
+                for (int j = 0; j < habitatSize; j++) {
+                    habitat[j][i] = furtuna.nextBoolean();
+                }
             }
         }
-        // in Test case stop to comment here
-
-        //Test cases
-        /*final int habitatSize = 10;
-        boolean[][] habitat = new boolean[habitatSize][habitatSize];
-        for (int i = 0; i < habitatSize; i++) {
-            for (int j = 0; j < habitatSize; j++) {
-                habitat[j][i] = false;
-            }
-        }
-        // case normal
-        habitat[3][2] = true;
-        habitat[3][3] = true;
-        habitat[3][4] = true;
-
-        // case edge
-        habitat[6][habitatSize-1] = true;
-        habitat[6][habitatSize-2] = true;
-        habitat[6][0] = true;
-
-        // case corner
-        habitat[0][0] = true;
-        habitat[0][1] = true;
-        habitat[0][habitatSize-1] = true;
-
-        // case corner
-        //habitat[habitatSize-1][0] = true;
-        //habitat[habitatSize-1][1] = true;
-        //habitat[habitatSize-1][habitatSize-1] = true;
-        */
 
         printHabitat(habitat);
         System.out.println("----------------------------------------------");
@@ -66,12 +57,22 @@ public class Main {
 
         // run the given numbers of generations
         for (int i = 0; i < gens; i++) {
-            habitat = cycleOfLife(habitat);
+            habitat = circleOfLife(habitat);
             //printHabitat(habitat);
         }
         System.out.println("----------------------------------------------");
         System.out.println("Life after " + gens + " Generations:");
         printHabitat(habitat);
+    }
+    // set 3 cells in a row needs the habitat and the position
+    public static void set3Cells(boolean[][] habitat, int posX, int posY) {
+        for (int i = posX; i < posX + 3; i++) {
+            if (i < habitat.length) {
+                habitat[posY][i] = true;
+            } else {
+                habitat[posY][i - habitat.length] = true;
+            }
+        }
     }
 
     // Prints the boolean Matrix == Habitat
@@ -342,7 +343,7 @@ public class Main {
         return -1; // in case of bullshit
     }
 
-    public static boolean[][] cycleOfLife(boolean[][] habitat) {
+    public static boolean[][] circleOfLife(boolean[][] habitat) {
         // the newHabitat is the result of a Life Cycle
         // default of boolean is false --> newHabitat is a wastland everything is dead
         boolean[][] newHabitat = new boolean[habitat.length][habitat[0].length];
