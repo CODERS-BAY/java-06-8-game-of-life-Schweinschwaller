@@ -6,24 +6,27 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
 
-        int habitatSize = 0;
         Scanner s = new Scanner(System.in);
+        // in Test case start to comment here
+        int habitatSize = 0;
         System.out.println("----------------------------------------------");
         do {
             System.out.print("Size of the Habitat:");
             habitatSize = s.nextInt();
         } while (habitatSize <= 1);
 
+        // there is life or no life --> boolean: false == nolife  true == life
         boolean[][] habitat = new boolean[habitatSize][habitatSize];
 
         Random furtuna = new Random();
         for (int i = 0; i < habitatSize; i++) {
             for (int j = 0; j < habitatSize; j++) {
-                habitat[j][i] = furtunasChoise(furtuna);
+                habitat[j][i] = furtuna.nextBoolean();
             }
         }
+        // in Test case stop to comment here
 
-        //Test
+        //Test cases
         /*final int habitatSize = 10;
         boolean[][] habitat = new boolean[habitatSize][habitatSize];
         for (int i = 0; i < habitatSize; i++) {
@@ -31,18 +34,37 @@ public class Main {
                 habitat[j][i] = false;
             }
         }
-        habitat[2][2] = true;
-        habitat[2][3] = true;
-        habitat[2][4] = true;*/
+        // case normal
+        habitat[3][2] = true;
+        habitat[3][3] = true;
+        habitat[3][4] = true;
+
+        // case edge
+        habitat[6][habitatSize-1] = true;
+        habitat[6][habitatSize-2] = true;
+        habitat[6][0] = true;
+
+        // case corner
+        habitat[0][0] = true;
+        habitat[0][1] = true;
+        habitat[0][habitatSize-1] = true;
+
+        // case corner
+        //habitat[habitatSize-1][0] = true;
+        //habitat[habitatSize-1][1] = true;
+        //habitat[habitatSize-1][habitatSize-1] = true;
+        */
 
         printHabitat(habitat);
         System.out.println("----------------------------------------------");
+        // get the userinput for the numbers of generations
         int gens = 0;
         do {
             System.out.print("Number of Life Cycles:");
             gens = s.nextInt();
         } while (gens <= 0);
 
+        // run the given numbers of generations
         for (int i = 0; i < gens; i++) {
             habitat = cycleOfLife(habitat);
             //printHabitat(habitat);
@@ -52,15 +74,15 @@ public class Main {
         printHabitat(habitat);
     }
 
-    public static boolean furtunasChoise(Random furtuna) {
-        return furtuna.nextBoolean();
-    }
-
+    // Prints the boolean Matrix == Habitat
     public static void printHabitat(boolean[][] habitat) {
+        // # == Life == True
+        // . == noLife == false
+        // | is a parting line
         for (int i = 0; i < habitat.length; i++) {
             for (int j = 0; j < habitat[0].length; j++) {
-
                 if (j == habitat[0].length - 1) {
+                    // the edge have no parting line
                     if (habitat[i][j]) {
                         System.out.printf("#");
                     } else {
@@ -77,12 +99,13 @@ public class Main {
     }
 
     // how many neighbors have a Cell
-    public static int neighbors(boolean[][] habitat, int posX, int posY) {
+    public static int neighbors(boolean[][] habitat, int posY, int posX) {
         int neighbor = 0;
-        int xMax = habitat.length - 1;
-        int yMax = habitat[0].length - 1;
+        int Max = habitat.length - 1;
 
-        if (habitat[posX][posY] == true) {
+        // neighbors also count the own position. that is not correct so if the position is a life the counter starts with -1
+        // i did this so i can use loops.
+        if (habitat[posY][posX] == true) {
             neighbor--;
         }
 
@@ -91,13 +114,13 @@ public class Main {
         //X-1 Y+1 | X Y+1 | X+1 Y+1
         //X-1 Y   | X Y   | X+1 Y
         //X-1 Y-1 | X Y-1 | X+1 Y-1
-        if (posX != 0
-                && posX != habitat.length - 1
-                && posY != 0
-                && posY != habitat[0].length - 1) {
+        if (       posY != 0
+                && posY != habitat.length - 1
+                && posX != 0
+                && posX != habitat[0].length - 1) {
 
-            for (int i = posX - 1; i <= posX + 1; i++) {
-                for (int j = posY - 1; j <= posY + 1; j++) {
+            for (int i = posY - 1; i <= posY + 1; i++) {
+                for (int j = posX - 1; j <= posX + 1; j++) {
                     if (habitat[i][j]) {
                         neighbor++;
                     }
@@ -107,25 +130,25 @@ public class Main {
         }
 
         //Case 2 - top edge
-        // Y == yMax and X NOT at Border
+        // Y == Max and X NOT at Border
         //X-1 Ymin | X Ymin | X+1 Ymin
-        //X-1 Y   | X Y   | X+1 Y
-        //X-1 Y-1| X Y-1| X+1 Y-1
-        if (posY == yMax
+        //X-1 Y    | X Y    | X+1 Y
+        //X-1 Y-1  | X Y-1  | X+1 Y-1
+        if (       posY == Max
                 && posX != 0
                 && posX != habitat[0].length - 1) {
 
-            for (int i = posX - 1; i <= posX + 1; i++) {
-                for (int j = posY - 1; j <= posY; j++) {
+            for (int i = posY - 1; i <= posY; i++) {
+                for (int j = posX - 1; j <= posX + 1; j++) {
                     if (habitat[i][j]) {
                         neighbor++;
                     }
                 }
             }
-
-            neighbor += habitat[posX - 1][0] ? 1 : 0;
-            neighbor += habitat[posX][0] ? 1 : 0;
-            neighbor += habitat[posX + 1][0] ? 1 : 0;
+            //X-1 Ymin | X Ymin | X+1 Ymin
+            neighbor += habitat[0][posX + 1] ? 1 : 0;
+            neighbor += habitat[0][posX] ? 1 : 0;
+            neighbor += habitat[0][posX - 1] ? 1 : 0;
 
             return neighbor;
         }
@@ -135,21 +158,21 @@ public class Main {
         //X-1 Y+1 | X Y+1 | X+1 Y+1
         //X-1 Y   | X Y   | X+1 Y
         //X-1 Ymax| X Ymax| X+1 Ymax
-        if (posY == 0
+        if (       posY == 0
                 && posX != 0
                 && posX != habitat[0].length - 1) {
 
-            for (int i = posX - 1; i <= posX + 1; i++) {
-                for (int j = posY; j <= posY + 1; j++) {
+            for (int i = posY; i <= posY + 1; i++) {
+                for (int j = posX - 1; j <= posX + 1; j++) {
                     if (habitat[i][j]) {
                         neighbor++;
                     }
                 }
             }
-
-            neighbor += habitat[posX - 1][yMax] ? 1 : 0;
-            neighbor += habitat[posX][yMax] ? 1 : 0;
-            neighbor += habitat[posX + 1][yMax] ? 1 : 0;
+            //X-1 Ymax | X Ymax | X+1 Ymax
+            neighbor += habitat[Max][posX - 1] ? 1 : 0;
+            neighbor += habitat[Max][posX] ? 1 : 0;
+            neighbor += habitat[Max][posX + 1] ? 1 : 0;
 
             return neighbor;
         }
@@ -159,21 +182,23 @@ public class Main {
         //Xmax Y+1 | X Y+1 | X+1 Y+1
         //Xmax Y   | X Y   | X+1 Y
         //Xmax Y-1 | X Y-1 | X+1 Y-1
-        if (posX == 0
+        if (       posX == 0
                 && posY != 0
                 && posY != habitat[0].length - 1) {
 
-            for (int i = posX; i <= posX + 1; i++) {
-                for (int j = posY - 1; j <= posY + 1; j++) {
+            for (int i = posY - 1; i <= posY + 1; i++) {
+                for (int j = posX; j <= posX + 1; j++) {
                     if (habitat[i][j]) {
                         neighbor++;
                     }
                 }
             }
-
-            neighbor += habitat[xMax][posY + 1] ? 1 : 0;
-            neighbor += habitat[xMax][posY] ? 1 : 0;
-            neighbor += habitat[xMax][posY - 1] ? 1 : 0;
+            //Xmax Y+1
+            //Xmax Y
+            //Xmax Y-1
+            neighbor += habitat[posY + 1][Max] ? 1 : 0;
+            neighbor += habitat[posY][Max] ? 1 : 0;
+            neighbor += habitat[posY - 1][Max] ? 1 : 0;
 
             return neighbor;
         }
@@ -183,21 +208,23 @@ public class Main {
         //X-1 Y+1 | X Y+1 | Xmin Y+1
         //X-1 Y   | X Y   | Xmin Y
         //X-1 Y-1 | X Y-1 | Xmin Y-1
-        if (posX == xMax
+        if (       posX == Max
                 && posY != 0
                 && posY != habitat[0].length - 1) {
 
-            for (int i = posX - 1; i <= posX; i++) {
-                for (int j = posY - 1; j <= posY + 1; j++) {
+            for (int i = posY - 1; i <= posY + 1; i++) {
+                for (int j = posX - 1; j <= posX; j++) {
                     if (habitat[i][j]) {
                         neighbor++;
                     }
                 }
             }
-
-            neighbor += habitat[0][posY + 1] ? 1 : 0;
-            neighbor += habitat[0][posY] ? 1 : 0;
-            neighbor += habitat[0][posY - 1] ? 1 : 0;
+            //Xmin Y+1
+            //Xmin Y
+            //Xmin Y-1
+            neighbor += habitat[posY + 1][0] ? 1 : 0;
+            neighbor += habitat[posY][0] ? 1 : 0;
+            neighbor += habitat[posY - 1][0] ? 1 : 0;
 
             return neighbor;
         }
@@ -207,21 +234,24 @@ public class Main {
         //Xmax Y+1  | X Y+1 | X-1 Y+1
         //Xmax Y    | X Y   | X+1 Y
         //Xmax Ymax | X Ymax | X+1 Ymax
-        if (posX == 0 && posY == 0) {
+        if (posY == 0 && posX == 0) {
 
-            for (int i = posX; i <= posX + 1; i++) {
-                for (int j = posY; j <= posY + 1; j++) {
+            for (int i = posY; i <= posY + 1; i++) {
+                for (int j = posX; j <= posX + 1; j++) {
                     if (habitat[i][j]) {
                         neighbor++;
                     }
                 }
             }
-            neighbor += habitat[xMax][posY + 1] ? 1 : 0;
-            neighbor += habitat[xMax][posY] ? 1 : 0;
-            neighbor += habitat[xMax][yMax] ? 1 : 0;
+            //Xmax Ymax | X Ymax | X+1 Ymax
+            neighbor += habitat[Max][Max] ? 1 : 0;
+            neighbor += habitat[Max][posX] ? 1 : 0;
+            neighbor += habitat[Max][posX + 1] ? 1 : 0;
 
-            neighbor += habitat[posX][yMax] ? 1 : 0;
-            neighbor += habitat[posX + 1][yMax] ? 1 : 0;
+            //Xmax Y+1
+            //Xmax Y
+            neighbor += habitat[posY + 1][Max] ? 1 : 0;
+            neighbor += habitat[posY][Max] ? 1 : 0;
 
             return neighbor;
         }
@@ -231,21 +261,24 @@ public class Main {
         //X-1 Y+1  | X Y+1  | Xmin Y+1
         //X-1 Y    | X Y    | Xmin Y
         //X-1 Ymax | X Ymax | Xmin Ymax
-        if (posX == yMax && posY == 0) {
+        if (posY == 0 && posX == Max) {
 
-            for (int i = posX - 1; i <= posX; i++) {
-                for (int j = posY; j <= posY + 1; j++) {
+            for (int i = posY; i <= posY + 1; i++) {
+                for (int j = posX - 1; j <= posX; j++) {
                     if (habitat[i][j]) {
                         neighbor++;
                     }
                 }
             }
-            neighbor += habitat[0][posY + 1] ? 1 : 0;
-            neighbor += habitat[0][posY] ? 1 : 0;
-            neighbor += habitat[0][yMax] ? 1 : 0;
+            //X-1 Ymax | X Ymax | Xmin Ymax
+            neighbor += habitat[Max][posX - 1] ? 1 : 0;
+            neighbor += habitat[Max][posX] ? 1 : 0;
+            neighbor += habitat[Max][0] ? 1 : 0;
 
-            neighbor += habitat[posX][yMax] ? 1 : 0;
-            neighbor += habitat[posX - 1][yMax] ? 1 : 0;
+            //Xmin Y+1
+            //Xmin Y
+            neighbor += habitat[posY + 1][0] ? 1 : 0;
+            neighbor += habitat[posY][0] ? 1 : 0;
 
             return neighbor;
         }
@@ -255,21 +288,24 @@ public class Main {
         //Xmax Ymin | X Ymin | X+1 Ymin
         //Xmax Y    | X Y    | X+1 Y
         //Xmax Y-1  | X Y-1  | X+1 Y-1
-        if (posX == 0 && posY == yMax) {
+        if (posY == Max && posX == 0) {
 
-            for (int i = posX; i <= posX + 1; i++) {
-                for (int j = posY - 1; j <= posY; j++) {
+            for (int i = posY - 1; i <= posY; i++) {
+                for (int j = posX; j <= posX + 1; j++) {
                     if (habitat[i][j]) {
                         neighbor++;
                     }
                 }
             }
-            neighbor += habitat[xMax][0] ? 1 : 0;
-            neighbor += habitat[xMax][posY] ? 1 : 0;
-            neighbor += habitat[xMax][posY - 1] ? 1 : 0;
+            //Xmax Ymin | X Ymin | X+1 Ymin
+            neighbor += habitat[0][Max] ? 1 : 0;
+            neighbor += habitat[0][posX] ? 1 : 0;
+            neighbor += habitat[0][posX + 1] ? 1 : 0;
 
-            neighbor += habitat[posX][0] ? 1 : 0;
-            neighbor += habitat[posX + 1][0] ? 1 : 0;
+            //Xmax Y
+            //Xmax Y-1
+            neighbor += habitat[posY][Max] ? 1 : 0;
+            neighbor += habitat[posY - 1][Max] ? 1 : 0;
 
             return neighbor;
         }
@@ -279,47 +315,60 @@ public class Main {
         //X-1 Ymin | X Ymin | Xmax Ymin
         //X-1 Y    | X Y    | Xmax Y
         //X-1 Y-1  | X Y-1  | Xmax Y-1
-        if (posX == xMax && posY == yMax) {
+        if (posY == Max && posX == Max) {
 
-            for (int i = posX - 1; i <= posX; i++) {
-                for (int j = posY - 1; j <= posY; j++) {
+            for (int i = posY - 1; i <= posY; i++) {
+                for (int j = posX - 1; j <= posX; j++) {
                     if (habitat[i][j]) {
                         neighbor++;
                     }
                 }
             }
-            neighbor += habitat[posX - 1][0] ? 1 : 0;
-            neighbor += habitat[posX][0] ? 1 : 0;
-            neighbor += habitat[xMax][0] ? 1 : 0;
-            neighbor += habitat[xMax][posY] ? 1 : 0;
-            neighbor += habitat[xMax][posY - 1] ? 1 : 0;
+            //X-1 Ymin | X Ymin
+            neighbor += habitat[0][posX - 1] ? 1 : 0;
+            neighbor += habitat[0][posX] ? 1 : 0;
+
+            //Xmax Ymin
+            //Xmax Y
+            //Xmax Y-1
+            neighbor += habitat[0][Max] ? 1 : 0;
+            neighbor += habitat[posY][Max] ? 1 : 0;
+            neighbor += habitat[posY - 1][Max] ? 1 : 0;
 
             return neighbor;
         }
 
-        System.out.println("Error: neighbor [ " + posX + " ][ " + posY + "]");
-        return -1; //woot?!
+        System.out.println("Error: neighbor [ " + posY + " ][ " + posX + "]");
+        return -1; // in case of bullshit
     }
 
     public static boolean[][] cycleOfLife(boolean[][] habitat) {
+        // the newHabitat is the result of a Life Cycle
+        // default of boolean is false --> newHabitat is a wastland everything is dead
         boolean[][] newHabitat = new boolean[habitat.length][habitat[0].length];
 
+        // go throw the Habitat and apply the rules.
+        // the result of the rules get noted in the newHabitat
         for (int i = 0; i < habitat.length; i++) {
             for (int j = 0; j < habitat[0].length; j++) {
                 int countNeighbors = neighbors(habitat, i, j);
                 if (habitat[i][j] == true) {
                     switch (countNeighbors) {
-                        case 2 -> newHabitat[i][j] = true;
-                        case 3 -> newHabitat[i][j] = true;
+                        //RULE: is a cell alive and has 2 or 3 neighbors, will it stay alive 🤝?
+                        case 2, 3 -> newHabitat[i][j] = true;
+                        //RULE: if a cell is alive and has fewer than 2 neighbors it dies of loneliness 😔
+                        //Rule: if a cell is alive and has more than 3 neighbors, it will die of overpopulation 💀
                         default -> newHabitat[i][j] = false;
                     }
                 } else {
+                    //RULE: if a cell is dead and has exactly 3 living neighbors, it will be born in the next generation 👶
                     if (countNeighbors == 3) {
                         newHabitat[i][j] = true;
                     }
                 }
             }
         }
+        // return newHabitat as result of the application of the rules
         return newHabitat;
     }
 }
